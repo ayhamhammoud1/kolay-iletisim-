@@ -14,6 +14,7 @@ import 'screens/home_screen.dart';
 import 'screens/translate_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/phrasebook_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
@@ -24,7 +25,11 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => SettingsProvider()..loadSettings()),
         ChangeNotifierProvider(create: (_) => HistoryProvider()..loadHistory()),
-        ChangeNotifierProvider(create: (_) => TranslationProvider()),
+        ChangeNotifierProxyProvider<HistoryProvider, TranslationProvider>(
+          create: (_) => TranslationProvider(),
+          update: (_, history, translation) => (translation ?? TranslationProvider())
+            ..onRecordSaved = (record) => history.addRecord(record),
+        ),
       ],
       child: const SpeakBridgeApp(),
     ),
@@ -51,6 +56,7 @@ class SpeakBridgeApp extends StatelessWidget {
         '/translate': (context) => const TranslateScreen(),
         '/history': (context) => const HistoryScreen(),
         '/settings': (context) => const SettingsScreen(),
+        '/phrasebook': (context) => const PhrasebookScreen(),
       },
     );
   }

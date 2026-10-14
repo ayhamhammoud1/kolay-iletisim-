@@ -287,7 +287,6 @@ class _CameraScreenState extends State<CameraScreen> {
                       ..._capturedLines.where((l) => l.translatedText != null).map((line) {
                         double boxLeft = (line.left * scale) + offsetX;
                         double boxTop = (line.top * scale) + offsetY;
-                        double boxWidth = line.width * scale;
                         double boxHeight = line.height * scale;
                         
                         double fontSize = boxHeight * 0.7;
@@ -301,10 +300,10 @@ class _CameraScreenState extends State<CameraScreen> {
                             constraints: BoxConstraints(maxWidth: constraints.maxWidth - boxLeft),
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppColors.accentCyan.withOpacity(0.95),
+                              color: AppColors.accentCyan.withValues(alpha: 0.95),
                               borderRadius: BorderRadius.circular(8),
                               boxShadow: [
-                                BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 4),
+                                BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 4),
                               ],
                             ),
                             child: Text(
@@ -337,7 +336,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       decoration: BoxDecoration(
-                        color: AppColors.accentRose.withOpacity(0.2),
+                        color: AppColors.accentRose.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: const Text('Galeriden Seç', style: TextStyle(color: AppColors.accentRose, fontWeight: FontWeight.w700)),
@@ -353,7 +352,7 @@ class _CameraScreenState extends State<CameraScreen> {
           if (_isProcessingCapture)
             Positioned.fill(
               child: Container(
-                color: AppColors.bgDeep.withOpacity(0.7),
+                color: AppColors.bgDeep.withValues(alpha: 0.7),
                 child: const Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -376,10 +375,10 @@ class _CameraScreenState extends State<CameraScreen> {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.bgDeep.withOpacity(0.88),
+                  color: AppColors.bgDeep.withValues(alpha: 0.88),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.accentCyan.withOpacity(0.3)),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20)],
+                  border: Border.all(color: AppColors.accentCyan.withValues(alpha: 0.3)),
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 20)],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -402,6 +401,15 @@ class _CameraScreenState extends State<CameraScreen> {
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (_liveOriginal.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        _liveOriginal,
+                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -419,7 +427,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
-                      color: AppColors.bgDeep.withOpacity(0.85),
+                      color: AppColors.bgDeep.withValues(alpha: 0.85),
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(color: AppColors.border),
                     ),
@@ -445,7 +453,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     child: Container(
                       width: 40, height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.bgDeep.withOpacity(0.85),
+                        color: AppColors.bgDeep.withValues(alpha: 0.85),
                         shape: BoxShape.circle,
                         border: Border.all(color: AppColors.border),
                       ),
@@ -474,7 +482,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 4),
-                        boxShadow: [BoxShadow(color: AppColors.accentCyan.withOpacity(0.3), blurRadius: 30)],
+                        boxShadow: [BoxShadow(color: AppColors.accentCyan.withValues(alpha: 0.3), blurRadius: 30)],
                       ),
                       child: Container(
                         margin: const EdgeInsets.all(4),
@@ -533,9 +541,9 @@ class _CameraScreenState extends State<CameraScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           margin: const EdgeInsets.only(bottom: 6),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.accentCyan.withOpacity(0.15) : Colors.transparent,
+                            color: isSelected ? AppColors.accentCyan.withValues(alpha: 0.15) : Colors.transparent,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: isSelected ? AppColors.accentCyan.withOpacity(0.4) : AppColors.border),
+                            border: Border.all(color: isSelected ? AppColors.accentCyan.withValues(alpha: 0.4) : AppColors.border),
                           ),
                           child: Row(
                             children: [
@@ -564,8 +572,8 @@ class _CameraScreenState extends State<CameraScreen> {
         width: 52, height: 52,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppColors.bgDeep.withOpacity(0.6),
-          border: Border.all(color: Colors.white.withOpacity(0.3)),
+          color: AppColors.bgDeep.withValues(alpha: 0.6),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
         ),
         child: Icon(icon, color: Colors.white, size: 22),
       ),

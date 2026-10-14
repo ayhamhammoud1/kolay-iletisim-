@@ -67,7 +67,7 @@ class _LanguagePill extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isOnGradient
-              ? Colors.white.withOpacity(0.2)
+              ? Colors.white.withValues(alpha: 0.2)
               : AppColors.gray100,
           borderRadius: BorderRadius.circular(100),
           border: isOnGradient
@@ -95,7 +95,7 @@ class _LanguagePill extends StatelessWidget {
               Icons.keyboard_arrow_down_rounded,
               size: 18,
               color: isOnGradient
-                  ? Colors.white.withOpacity(0.7)
+                  ? Colors.white.withValues(alpha: 0.7)
                   : AppColors.gray400,
             ),
           ],
@@ -181,7 +181,7 @@ class _SwapButton extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: isOnGradient
-              ? Colors.white.withOpacity(0.25)
+              ? Colors.white.withValues(alpha: 0.25)
               : AppColors.primaryLight,
         ),
         child: Icon(

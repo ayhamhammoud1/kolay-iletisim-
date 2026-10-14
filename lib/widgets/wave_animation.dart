@@ -98,7 +98,7 @@ class _WavePainter extends CustomPainter {
       final top = (maxHeight - barHeight) / 2;
 
       final paint = Paint()
-        ..color = color.withOpacity(0.4 + 0.6 * heightFraction)
+        ..color = color.withValues(alpha: 0.4 + 0.6 * heightFraction)
         ..style = PaintingStyle.fill;
 
       canvas.drawRRect(

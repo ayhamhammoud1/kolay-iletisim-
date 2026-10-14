@@ -26,10 +26,15 @@ class Place {
     final lon = json['lon'] ?? (json['center'] != null ? json['center']['lon'] : 0.0);
 
     String type = 'other';
-    if (tags['tourism'] != null) type = tags['tourism'];
-    else if (tags['amenity'] != null) type = tags['amenity'];
-    else if (tags['shop'] != null) type = 'shop_${tags['shop']}';
-    else if (tags['historic'] != null) type = 'historic';
+    if (tags['tourism'] != null) {
+      type = tags['tourism'];
+    } else if (tags['amenity'] != null) {
+      type = tags['amenity'];
+    } else if (tags['shop'] != null) {
+      type = 'shop_${tags['shop']}';
+    } else if (tags['historic'] != null) {
+      type = 'historic';
+    }
 
     return Place(
       id: json['id']?.toString() ?? '',

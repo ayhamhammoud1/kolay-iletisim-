@@ -71,7 +71,7 @@ class _MicButtonState extends State<MicButton>
                 height: widget.size * _pulseAnimation.value * 1.5,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                 ),
               ),
             if (widget.isListening)
@@ -80,7 +80,7 @@ class _MicButtonState extends State<MicButton>
                 height: widget.size * _pulseAnimation.value * 1.2,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.primary.withOpacity(0.2),
+                  color: AppColors.primary.withValues(alpha: 0.2),
                 ),
               ),
             GestureDetector(
@@ -107,7 +107,7 @@ class _MicButtonState extends State<MicButton>
                       color: (widget.isListening
                               ? AppColors.danger
                               : AppColors.primary)
-                          .withOpacity(0.4),
+                          .withValues(alpha: 0.4),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),

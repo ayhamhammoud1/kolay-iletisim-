@@ -5,6 +5,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../models/translation_model.dart';
 import '../services/translation_controller.dart';
 import '../services/gemini_service.dart';
 
@@ -14,10 +15,32 @@ class TranslationProvider extends ChangeNotifier {
 
   StreamSubscription<TranslationState>? _sub;
   final TextEditingController textController = TextEditingController();
+  void Function(TranslationRecord)? onRecordSaved;
+  String _lastSavedKey = '';
 
   TranslationProvider() {
     _sub = TranslationController.instance.stateStream.listen((s) {
       _state = s;
+      if (s.phase == TranslationPhase.success &&
+          s.translatedText.isNotEmpty &&
+          s.recognizedText.isNotEmpty) {
+        final key = '${s.recognizedText}_${s.translatedText}';
+        if (_lastSavedKey != key) {
+          _lastSavedKey = key;
+          onRecordSaved?.call(
+            TranslationRecord(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              originalText: s.recognizedText,
+              translatedText: s.translatedText,
+              sourceLanguageCode: s.sourceLanguage.code,
+              targetLanguageCode: s.targetLanguage.code,
+              sourceLanguageLabel: s.sourceLanguage.label,
+              targetLanguageLabel: s.targetLanguage.label,
+              createdAt: DateTime.now(),
+            ),
+          );
+        }
+      }
       notifyListeners();
     });
   }

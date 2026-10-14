@@ -101,9 +101,6 @@ class AudioService {
     _listeningStateController.add(ListeningState.listening);
 
     await _stt.listen(
-      localeId: config.localeId,
-      listenFor: config.listenFor,
-      pauseFor: config.pauseFor,
       onResult: (SpeechRecognitionResult result) {
         if (result.hasConfidenceRating && result.confidence > 0) {
           _partialTextController.add(result.recognizedWords);
@@ -125,7 +122,10 @@ class AudioService {
           }
         }
       },
-      cancelOnError: true,
+      listenOptions: stt.SpeechListenOptions(
+        cancelOnError: true,
+        partialResults: true,
+      ),
     );
 
     // Timeout

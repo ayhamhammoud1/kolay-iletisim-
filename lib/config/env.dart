@@ -7,8 +7,13 @@
 class Env {
   Env._();
 
-  /// Gelecekte API key gerekirse buraya eklenebilir.
+  /// OCR.space API Key (يمكن تمريره وقت البناء: --dart-define=OCR_API_KEY=your_key)
+  static const String ocrApiKey = String.fromEnvironment(
+    'OCR_API_KEY',
+    defaultValue: 'K85674688188957',
+  );
+
   static Future<void> init() async {
-    // Ücretsiz API kullanıyoruz, başlatma gerekmez.
+    // Başlatma gerekirse buraya eklenebilir.
   }
 }

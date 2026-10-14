@@ -295,7 +295,7 @@ class _LocationScreenState extends State<LocationScreen> {
               flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
             ),
             onMapEvent: _onMapEvent,
-            onTap: (_, __) => _dismissPlaceDetail(),
+            onTap: (_, _) => _dismissPlaceDetail(),
           ),
           children: [
             TileLayer(
@@ -312,7 +312,7 @@ class _LocationScreenState extends State<LocationScreen> {
                     height: 36,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4285F4).withOpacity(0.25),
+                        color: const Color(0xFF4285F4).withValues(alpha: 0.25),
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0xFF4285F4), width: 2),
                       ),
@@ -346,7 +346,7 @@ class _LocationScreenState extends State<LocationScreen> {
                           border: Border.all(color: color, width: isSelected ? 3 : 2),
                           boxShadow: [
                             BoxShadow(
-                              color: color.withOpacity(0.4),
+                              color: color.withValues(alpha: 0.4),
                               blurRadius: isSelected ? 12 : 6,
                               spreadRadius: isSelected ? 2 : 0,
                             ),
@@ -370,11 +370,11 @@ class _LocationScreenState extends State<LocationScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: AppColors.bgDeep.withOpacity(0.92),
+              color: AppColors.bgDeep.withValues(alpha: 0.92),
               borderRadius: BorderRadius.circular(100),
               border: Border.all(color: AppColors.border),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20),
+                BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 20),
               ],
             ),
             child: Row(
@@ -449,11 +449,11 @@ class _LocationScreenState extends State<LocationScreen> {
       child: Container(
         width: 48, height: 48,
         decoration: BoxDecoration(
-          color: AppColors.bgDeep.withOpacity(0.92),
+          color: AppColors.bgDeep.withValues(alpha: 0.92),
           shape: BoxShape.circle,
           border: Border.all(color: AppColors.border),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10),
           ],
         ),
         child: Icon(icon, color: color, size: 22),
@@ -469,12 +469,12 @@ class _LocationScreenState extends State<LocationScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.bgDeep.withOpacity(0.95),
+        color: AppColors.bgDeep.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
         boxShadow: [
-          BoxShadow(color: color.withOpacity(0.15), blurRadius: 30, spreadRadius: 2),
-          BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20),
+          BoxShadow(color: color.withValues(alpha: 0.15), blurRadius: 30, spreadRadius: 2),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 20),
         ],
       ),
       child: Column(
@@ -495,9 +495,9 @@ class _LocationScreenState extends State<LocationScreen> {
               Container(
                 width: 52, height: 52,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: color.withOpacity(0.3)),
+                  border: Border.all(color: color.withValues(alpha: 0.3)),
                 ),
                 child: Icon(icon, color: color, size: 26),
               ),
@@ -523,7 +523,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.2),
+                            color: color.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -535,7 +535,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         Icon(Icons.directions_walk_rounded, size: 14, color: Colors.white54),
                         const SizedBox(width: 4),
                         Text(
-                          '${place.distance < 1000 ? '${place.distance.toInt()}m' : '${(place.distance / 1000).toStringAsFixed(1)}km'}',
+                          place.distance < 1000 ? '${place.distance.toInt()}m' : '${(place.distance / 1000).toStringAsFixed(1)}km',
                           style: const TextStyle(color: Colors.white54, fontSize: 12),
                         ),
                       ],
@@ -549,7 +549,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Container(
                   width: 32, height: 32,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.close, color: Colors.white54, size: 16),
@@ -566,11 +566,11 @@ class _LocationScreenState extends State<LocationScreen> {
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [color, color.withOpacity(0.7)],
+                  colors: [color, color.withValues(alpha: 0.7)],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
-                  BoxShadow(color: color.withOpacity(0.3), blurRadius: 12),
+                  BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 12),
                 ],
               ),
               child: const Row(

@@ -14,7 +14,7 @@ class MapControls extends StatelessWidget {
   final bool isCyclingLayerActive;
 
   const MapControls({
-    Key? key,
+    super.key,
     required this.onZoomIn,
     required this.onZoomOut,
     required this.onMyLocation,
@@ -22,7 +22,7 @@ class MapControls extends StatelessWidget {
     this.onToggleCyclingLayer,
     this.isFollowingLocation = false,
     this.isCyclingLayerActive = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -92,12 +92,12 @@ class MapControls extends StatelessWidget {
 
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
-      color: AppColors.bgDeep.withOpacity(0.85),
+      color: AppColors.bgDeep.withValues(alpha: 0.85),
       borderRadius: BorderRadius.circular(12),
       border: Border.all(color: AppColors.border, width: 1),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: 0.3),
           blurRadius: 8,
           offset: const Offset(0, 2),
         ),

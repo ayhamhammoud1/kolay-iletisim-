@@ -45,7 +45,7 @@ class TranslationCard extends StatelessWidget {
         border: Border.all(color: AppColors.gray200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -75,7 +75,7 @@ class TranslationCard extends StatelessWidget {
             label: targetLabel,
             text: translatedText,
             onSpeak: onSpeakTranslated,
-            backgroundColor: AppColors.primaryLight.withOpacity(0.3),
+            backgroundColor: AppColors.primaryLight.withValues(alpha: 0.3),
             isTop: false,
             textColor: AppColors.primary,
           ),
@@ -171,7 +171,7 @@ class _TextSection extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: (textColor ?? AppColors.gray400).withOpacity(0.1),
+                      color: (textColor ?? AppColors.gray400).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(

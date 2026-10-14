@@ -6,13 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/translation_provider.dart';
-import '../providers/history_provider.dart';
-import '../models/translation_model.dart';
-import '../services/translation_controller.dart';
 import '../theme/app_colors.dart';
-import '../widgets/mic_button.dart';
-import '../widgets/language_selector.dart';
-import '../widgets/translation_card.dart';
 import '../widgets/wave_animation.dart';
 
 class TranslateScreen extends StatelessWidget {
@@ -30,24 +24,57 @@ class TranslateScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-              // Header
-              const Padding(
-                padding: EdgeInsets.only(top: 16, bottom: 32),
-                child: Column(
+              // Header with Quick Navigation Actions
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Kolay İletişim',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 30,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary, // In real app we might use ShaderMask for gradient text
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ShaderMask(
+                          shaderCallback: (bounds) => AppColors.cyanRoseGradient.createShader(bounds),
+                          child: const Text(
+                            'SpeakBridge',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 26,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Konuşun, anında çevirin',
+                          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 6),
-                    Text(
-                      'Konuşun, anında çevirin',
-                      style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                    Row(
+                      children: [
+                        _buildHeaderAction(
+                          context,
+                          icon: Icons.menu_book_rounded,
+                          tooltip: 'Cümle Rehberi (Offline)',
+                          onTap: () => Navigator.pushNamed(context, '/phrasebook'),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildHeaderAction(
+                          context,
+                          icon: Icons.history_rounded,
+                          tooltip: 'Geçmiş & Favoriler',
+                          onTap: () => Navigator.pushNamed(context, '/history'),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildHeaderAction(
+                          context,
+                          icon: Icons.settings_rounded,
+                          tooltip: 'Ayarlar',
+                          onTap: () => Navigator.pushNamed(context, '/settings'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -67,7 +94,7 @@ class TranslateScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                         gradient: AppColors.cyanRoseGradient,
                         boxShadow: [
-                          BoxShadow(color: AppColors.accentCyan.withOpacity(0.3), blurRadius: 20, offset: const Offset(0,4))
+                          BoxShadow(color: AppColors.accentCyan.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0,4))
                         ]
                       ),
                       child: const Icon(Icons.swap_horiz_rounded, color: Colors.white),
@@ -86,7 +113,7 @@ class TranslateScreen extends StatelessWidget {
                     colors: [Color(0x0C00F0FF), Color(0x08FFD700)],
                     begin: Alignment.topLeft, end: Alignment.bottomRight,
                   ),
-                  border: Border.all(color: AppColors.accentCyan.withOpacity(0.15)),
+                  border: Border.all(color: AppColors.accentCyan.withValues(alpha: 0.15)),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 padding: const EdgeInsets.all(22),
@@ -121,9 +148,9 @@ class TranslateScreen extends StatelessWidget {
                       colors: [Color(0x0CFFD700), Color(0x08FF4D8D)],
                       begin: Alignment.topLeft, end: Alignment.bottomRight,
                     ),
-                    border: Border.all(color: AppColors.accentGold.withOpacity(0.15)),
+                    border: Border.all(color: AppColors.accentGold.withValues(alpha: 0.15)),
                     borderRadius: BorderRadius.circular(24),
-                    boxShadow: [BoxShadow(color: AppColors.accentGold.withOpacity(0.05), blurRadius: 30)],
+                    boxShadow: [BoxShadow(color: AppColors.accentGold.withValues(alpha: 0.05), blurRadius: 30)],
                   ),
                   padding: const EdgeInsets.all(22),
                   margin: const EdgeInsets.only(bottom: 28),
@@ -162,9 +189,9 @@ class TranslateScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: AppColors.primaryGradient,
-                    border: Border.all(color: AppColors.accentCyan.withOpacity(0.3), width: 4),
+                    border: Border.all(color: AppColors.accentCyan.withValues(alpha: 0.3), width: 4),
                     boxShadow: [
-                      BoxShadow(color: AppColors.accentCyan.withOpacity(0.4), blurRadius: 40, offset: const Offset(0, 8)),
+                      BoxShadow(color: AppColors.accentCyan.withValues(alpha: 0.4), blurRadius: 40, offset: const Offset(0, 8)),
                     ]
                   ),
                   child: Icon(
@@ -220,8 +247,8 @@ class TranslateScreen extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: const LinearGradient(colors: [Color(0x1A00F0FF), Color(0x1AFFD700)]),
-            border: Border.all(color: AppColors.accentCyan.withOpacity(0.2), width: 2),
-            boxShadow: [BoxShadow(color: AppColors.accentCyan.withOpacity(0.1), blurRadius: 20)],
+            border: Border.all(color: AppColors.accentCyan.withValues(alpha: 0.2), width: 2),
+            boxShadow: [BoxShadow(color: AppColors.accentCyan.withValues(alpha: 0.1), blurRadius: 20)],
           ),
           child: Center(
             child: Text(code, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
@@ -243,7 +270,7 @@ class TranslateScreen extends StatelessWidget {
           gradient: isPrimary ? AppColors.primaryGradient : null,
           color: isPrimary ? null : AppColors.glass,
           border: isPrimary ? null : Border.all(color: AppColors.border),
-          boxShadow: isPrimary ? [BoxShadow(color: AppColors.accentCyan.withOpacity(0.3), blurRadius: 20, offset: const Offset(0,4))] : null,
+          boxShadow: isPrimary ? [BoxShadow(color: AppColors.accentCyan.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0,4))] : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -252,6 +279,21 @@ class TranslateScreen extends StatelessWidget {
             const SizedBox(width: 8),
             Text(label, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isPrimary ? Colors.white : AppColors.textPrimary)),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderAction(BuildContext context, {required IconData icon, required String tooltip, required VoidCallback onTap}) {
+    return IconButton(
+      icon: Icon(icon, color: Colors.white, size: 20),
+      tooltip: tooltip,
+      onPressed: onTap,
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.bgCardHover,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppColors.border),
         ),
       ),
     );

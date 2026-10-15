@@ -7,10 +7,11 @@
 class Env {
   Env._();
 
-  /// OCR.space API Key (يمكن تمريره وقت البناء: --dart-define=OCR_API_KEY=your_key)
+  /// OCR.space API Key (تمريره اختياري وقت البناء: --dart-define=OCR_API_KEY=your_key)
+  /// إذا كان فارغاً يتم استخدام Google ML Kit On-Device بدلاً منه.
   static const String ocrApiKey = String.fromEnvironment(
     'OCR_API_KEY',
-    defaultValue: 'K85674688188957',
+    defaultValue: '',
   );
 
   static Future<void> init() async {

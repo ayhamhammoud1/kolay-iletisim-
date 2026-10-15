@@ -178,7 +178,7 @@ class _CameraScreenState extends State<CameraScreen> {
       final bytes = await file.readAsBytes();
       final image = await decodeImageFromList(bytes);
       
-      _processCapturedImage(bytes, image.width.toDouble(), image.height.toDouble());
+      _processCapturedImage(bytes, image.width.toDouble(), image.height.toDouble(), filePath: file.path);
     } catch (_) {}
   }
 
@@ -196,11 +196,11 @@ class _CameraScreenState extends State<CameraScreen> {
       
       final image = await decodeImageFromList(bytes);
       
-      _processCapturedImage(bytes, image.width.toDouble(), image.height.toDouble());
+      _processCapturedImage(bytes, image.width.toDouble(), image.height.toDouble(), filePath: picked.path);
     } catch (_) {}
   }
 
-  Future<void> _processCapturedImage(Uint8List bytes, double w, double h) async {
+  Future<void> _processCapturedImage(Uint8List bytes, double w, double h, {String? filePath}) async {
     setState(() {
       _capturedImage = bytes;
       _capturedImageWidth = w;
@@ -209,8 +209,8 @@ class _CameraScreenState extends State<CameraScreen> {
       _capturedLines = [];
     });
 
-    // 1. OCR ile satırları al
-    final ocrResult = await OcrService.instance.extractTextFromImage(bytes);
+    // 1. OCR ile satırları al (Google ML Kit on-device)
+    final ocrResult = await OcrService.instance.extractTextFromImage(bytes, filePath: filePath);
     List<OcrTextLine>? lines;
     ocrResult.when(
       success: (l) => lines = l,

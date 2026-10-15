@@ -1,12 +1,16 @@
 // ============================================================
 // lib/services/ocr_service.dart
-// Fotoğraftaki metni tanıyan ücretsiz OCR servisi.
-// OCR.space Free API kullanır.
+// Production-Ready Hybrid OCR Service
+// 1. Google ML Kit On-Device Text Recognition (Mobile native, 0 API key, 0 internet)
+// 2. OCR.space Web API fallback (optional when API key is provided)
 // ============================================================
 
 import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:http/http.dart' as http;
+
 import '../config/env.dart';
 import '../models/service_result.dart';
 import '../models/ocr_text_line.dart';
@@ -17,101 +21,140 @@ class OcrService {
   static final OcrService instance = OcrService._internal();
   static const _tag = 'OcrService';
 
-  // OCR.space API anahtarı (Env üzerinden yapılandırılır)
+  // OCR.space API endpoint (optional fallback)
   static String get _apiKey => Env.ocrApiKey;
   static const _endpoint = 'https://api.ocr.space/parse/image';
 
-  /// Fotoğraftan metin çıkarır (base64 olarak gönderir) ve koordinatlarıyla birlikte döner.
-  Future<ServiceResult<List<OcrTextLine>>> extractTextFromImage(Uint8List imageBytes) async {
-    try {
-      AppLogger.i(_tag, 'OCR başlatılıyor (${imageBytes.length} byte)...');
+  /// Extracts text and line coordinates from image bytes or file path.
+  Future<ServiceResult<List<OcrTextLine>>> extractTextFromImage(
+    Uint8List imageBytes, {
+    String? filePath,
+  }) async {
+    // ─── TIER 1: On-Device Google ML Kit (Android / iOS) ───
+    if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS)) {
+      try {
+        String? targetPath = filePath;
+        File? tempFile;
 
-      final base64Image = 'data:image/jpeg;base64,${base64Encode(imageBytes)}';
-
-      final response = await http.post(
-        Uri.parse(_endpoint),
-        body: {
-          'apikey': _apiKey,
-          'base64Image': base64Image,
-          'language': 'tur', // Türkçe + otomatik algılama
-          'isOverlayRequired': 'true', // Koordinat verisi için
-          'detectOrientation': 'true',
-          'scale': 'true',
-          'OCREngine': '2', // Engine 2 daha iyi
-        },
-      ).timeout(const Duration(seconds: 45));
-
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        
-        if (json['IsErroredOnProcessing'] == true) {
-          final errorMsg = json['ErrorMessage']?.toString() ?? 'OCR hatası';
-          AppLogger.w(_tag, 'OCR hatası: $errorMsg');
-          return ServiceFailure(errorMsg);
+        if (targetPath == null || targetPath.isEmpty) {
+          final tempDir = Directory.systemTemp;
+          tempFile = File('${tempDir.path}/ocr_${DateTime.now().millisecondsSinceEpoch}.jpg');
+          await tempFile.writeAsBytes(imageBytes);
+          targetPath = tempFile.path;
         }
 
-        final results = json['ParsedResults'] as List?;
-        if (results == null || results.isEmpty) {
-          return const ServiceFailure('Fotoğrafta metin bulunamadı.');
+        final inputImage = InputImage.fromFilePath(targetPath);
+        final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+        final recognizedText = await textRecognizer.processImage(inputImage);
+        await textRecognizer.close();
+
+        if (tempFile != null && await tempFile.exists()) {
+          try {
+            await tempFile.delete();
+          } catch (_) {}
         }
 
-        final firstResult = results.first;
-        final textOverlay = firstResult['TextOverlay'];
-        
-        List<OcrTextLine> parsedLines = [];
-
-        if (textOverlay != null && textOverlay['Lines'] != null) {
-          final lines = textOverlay['Lines'] as List;
-          for (var line in lines) {
-            final lineText = line['LineText']?.toString().trim() ?? '';
-            if (lineText.isNotEmpty) {
-              final maxHeight = (line['MaxHeight'] as num?)?.toDouble() ?? 0.0;
-              final minTop = (line['MinTop'] as num?)?.toDouble() ?? 0.0;
-              
-              // Calculate left and width from words if available
-              double left = 0.0;
-              double width = 0.0;
-              final words = line['Words'] as List?;
-              if (words != null && words.isNotEmpty) {
-                left = (words.first['Left'] as num?)?.toDouble() ?? 0.0;
-                final lastWord = words.last;
-                final lastLeft = (lastWord['Left'] as num?)?.toDouble() ?? 0.0;
-                final lastWidth = (lastWord['Width'] as num?)?.toDouble() ?? 0.0;
-                width = (lastLeft + lastWidth) - left;
-              }
-
-              parsedLines.add(OcrTextLine(
-                text: lineText,
-                left: left,
-                top: minTop,
-                width: width,
-                height: maxHeight,
-              ));
+        final List<OcrTextLine> parsedLines = [];
+        for (final block in recognizedText.blocks) {
+          for (final line in block.lines) {
+            final t = line.text.trim();
+            if (t.isNotEmpty) {
+              final rect = line.boundingBox;
+              parsedLines.add(
+                OcrTextLine(
+                  text: t,
+                  left: rect.left,
+                  top: rect.top,
+                  width: rect.width,
+                  height: rect.height,
+                ),
+              );
             }
           }
-        } else {
-          // Geriye dönük uyumluluk: TextOverlay yoksa düz metni tek satır olarak ekle
-          final parsedText = firstResult['ParsedText']?.toString().trim() ?? '';
-          if (parsedText.isNotEmpty) {
-             parsedLines.add(OcrTextLine(
-                text: parsedText,
-                left: 0, top: 0, width: 0, height: 0,
-             ));
+        }
+
+        if (parsedLines.isNotEmpty) {
+          AppLogger.i(_tag, '✅ ML Kit On-Device OCR: ${parsedLines.length} lines detected');
+          return ServiceSuccess(parsedLines);
+        }
+      } catch (e) {
+        AppLogger.w(_tag, 'ML Kit On-Device OCR error, checking fallback: $e');
+      }
+    }
+
+    // ─── TIER 2: OCR.space Web API Fallback (Only if key configured) ───
+    if (_apiKey.isNotEmpty) {
+      try {
+        AppLogger.i(_tag, 'OCR.space web fallback running (${imageBytes.length} bytes)...');
+        final base64Image = 'data:image/jpeg;base64,${base64Encode(imageBytes)}';
+
+        final response = await http.post(
+          Uri.parse(_endpoint),
+          body: {
+            'apikey': _apiKey,
+            'base64Image': base64Image,
+            'language': 'tur',
+            'isOverlayRequired': 'true',
+            'detectOrientation': 'true',
+            'scale': 'true',
+            'OCREngine': '2',
+          },
+        ).timeout(const Duration(seconds: 30));
+
+        if (response.statusCode == 200) {
+          final json = jsonDecode(response.body);
+          if (json['IsErroredOnProcessing'] == true) {
+            final errorMsg = json['ErrorMessage']?.toString() ?? 'OCR hatası';
+            return ServiceFailure(errorMsg);
+          }
+
+          final results = json['ParsedResults'] as List?;
+          if (results == null || results.isEmpty) {
+            return const ServiceFailure('Fotoğrafta metin bulunamadı.');
+          }
+
+          final firstResult = results.first;
+          final textOverlay = firstResult['TextOverlay'];
+          final List<OcrTextLine> parsedLines = [];
+
+          if (textOverlay != null && textOverlay['Lines'] != null) {
+            final lines = textOverlay['Lines'] as List;
+            for (var line in lines) {
+              final lineText = line['LineText']?.toString().trim() ?? '';
+              if (lineText.isNotEmpty) {
+                final maxHeight = (line['MaxHeight'] as num?)?.toDouble() ?? 0.0;
+                final minTop = (line['MinTop'] as num?)?.toDouble() ?? 0.0;
+                double left = 0.0;
+                double width = 0.0;
+                final words = line['Words'] as List?;
+                if (words != null && words.isNotEmpty) {
+                  left = (words.first['Left'] as num?)?.toDouble() ?? 0.0;
+                  final lastWord = words.last;
+                  final lastLeft = (lastWord['Left'] as num?)?.toDouble() ?? 0.0;
+                  final lastWidth = (lastWord['Width'] as num?)?.toDouble() ?? 0.0;
+                  width = (lastLeft + lastWidth) - left;
+                }
+
+                parsedLines.add(OcrTextLine(
+                  text: lineText,
+                  left: left,
+                  top: minTop,
+                  width: width,
+                  height: maxHeight,
+                ));
+              }
+            }
+          }
+
+          if (parsedLines.isNotEmpty) {
+            return ServiceSuccess(parsedLines);
           }
         }
-
-        if (parsedLines.isEmpty) {
-          return const ServiceFailure('Fotoğrafta okunabilir metin bulunamadı.');
-        }
-
-        AppLogger.i(_tag, 'OCR başarılı: ${parsedLines.length} satır algılandı');
-        return ServiceSuccess(parsedLines);
-      } else {
-        return ServiceFailure('OCR servisi yanıt vermedi (${response.statusCode})');
+      } catch (e) {
+        AppLogger.w(_tag, 'OCR.space fallback error: $e');
       }
-    } catch (e) {
-      AppLogger.e(_tag, 'OCR hatası', e);
-      return ServiceFailure('Metin tanıma sırasında hata: $e');
     }
+
+    return const ServiceFailure('Fotoğrafta okunabilir metin bulunamadı.');
   }
 }
